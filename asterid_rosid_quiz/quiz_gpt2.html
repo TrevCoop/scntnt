@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Asterid or Rosid</title>
+
+
+<!-- ********************************* STYLE ************************************* -->
+
+
+<style>
+
+
+
+body{
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(135deg,#4b0082,#ff4fd8);
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.quiz-container{
+background:white;
+width:420px;
+padding:25px;
+border-radius:14px;
+box-shadow:0 10px 25px rgba(0,0,0,0.25);
+text-align:center;
+max-height:90vh;
+overflow:auto;
+}
+
+h1{
+margin-top:0;
+color:#6a0dad;
+}
+
+.hovertext-asterid{
+cursor:help;
+border-bottom:2px dotted #d633ff;
+}
+
+.hovertext-rosid{
+cursor:help;
+border-bottom:2px dotted #ff4fa3;
+}
+
+
+#progress{
+margin-bottom:10px;
+font-weight:bold;
+color:#6a0dad;
+}
+
+.question-image{
+width:100%;
+height:200px;
+object-fit:cover;
+border-radius:10px;
+margin:10px 0;
+background:#eee;
+}
+
+.question{
+font-size:18px;
+margin:10px 0 15px 0;
+}
+
+button{
+width:120px;
+padding:10px;
+margin:10px;
+border:none;
+border-radius:8px;
+font-size:16px;
+cursor:pointer;
+color:white;
+}
+
+.update-active{
+background:#2f7df6;
+}
+
+.yes{ background:#d633ff; }
+.no{ background:#ff4fa3; }
+
+button:hover{ opacity:0.85; }
+
+#result{
+font-size:20px;
+font-weight:bold;
+color:#6a0dad;
+margin-top:10px;
+}
+
+.review{
+text-align:left;
+margin-top:20px;
+font-size:15px;
+}
+
+.review-item{
+margin-bottom:15px;
+padding:10px;
+border-left:4px solid #ff4fa3;
+background:#faf5ff;
+border-radius:6px;
+}
+
+.correct-answer{
+font-weight:bold;
+color:#6a0dad;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="quiz-container">
+
+	<h1>&#127803 <span class="hovertext-asterid" title="Asterids are a large group of flowering plants with over 80,000 species, including the iconic sunflower.">Asterid</span> or <span class="hovertext-rosid" title="Rosids are a large group of flowering plants with over 70,000 species, including the classic rose.">Rosid</span>? &#127801</h1>
+
+	<div id="progress"></div>
+
+	<img id="questionImage" class="question-image" src="">
+
+	<div id="questionText" class="question"></div>
+
+	<div id="buttons">
+		<button class="yes" onclick="answer(true)">Asterid</button>
+		<button class="no" onclick="answer(false)">Rosid</button>
+	</div>
+
+	<div id="result"></div>
+	<div id="review" class="review"></div>
+
+	<div id="quizSetup">
+
+		<label for="questionSlider">Modify quiz length:</label>
+
+		<input type="range" id="questionSlider" min="5" max="quiz.length" value="10">
+
+	<div id="sliderValue">10</div>
+
+		<button id="updateButton" onclick="startQuiz()">Update</button>
+
+	</div>
+
+</div>
+
+<script>
+
+const quiz = [
+
+{
+question:"Carrot (Daucus carota)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Vegetable-Carrot-Bundle-wStalks.jpg/500px-Vegetable-Carrot-Bundle-wStalks.jpg"
+},
+
+{
+question:"Huckleberry (Vaccinium)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Bog_huckleberry.jpg/330px-Bog_huckleberry.jpg"
+},
+
+{
+question:"Mesquite (Prosopis)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Khejri.jpg/500px-Khejri.jpg"
+},
+
+{
+question:"Hops (Humulus)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Humulus_Lupulus_Hopfendolde-mit-hopfengarten.jpg/500px-Humulus_Lupulus_Hopfendolde-mit-hopfengarten.jpg"
+},
+
+{
+question:"Chestnut (Castanea)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Ch%C3%A2taignier_120807_1.jpg/500px-Ch%C3%A2taignier_120807_1.jpg"
+},
+
+{
+question:"Sunflower	(Helianthus annuus)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Sunflower_sky_backdrop.jpg/500px-Sunflower_sky_backdrop.jpg"
+},
+
+{
+question:"Elderberry (Sambucus)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Sambucus-berries.jpg/500px-Sambucus-berries.jpg"
+},
+
+{
+question:"Jasmine (Jasminum officinale)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Common_Jasmine.jpg/500px-Common_Jasmine.jpg"
+},
+
+{
+question:"Horseradish (Armoracia rusticana)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Armoracia_rusticana.jpg/500px-Armoracia_rusticana.jpg"
+},
+
+{
+question:"Birch	(Betula)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/DosenmoorBirken1.jpg/500px-DosenmoorBirken1.jpg"
+},
+
+{
+question:"Lettuce (Lactuca sativa)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Iceberg_lettuce_in_SB.jpg/500px-Iceberg_lettuce_in_SB.jpg"
+},
+
+{
+question:"Cucumber (Cucumis sativus)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/ARS_cucumber.jpg/500px-ARS_cucumber.jpg"
+},
+
+{
+question:"Yarrow (Achillea millefolium)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Achillea_millefolium_4.jpg/960px-Achillea_millefolium_4.jpg"
+},
+
+{
+question:"Baobab (Adansonia)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Baobab_sacree.JPG/250px-Baobab_sacree.JPG"
+},
+
+{
+question:"Feverfew (Tanacetum parthenium)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Feverfew.jpg/500px-Feverfew.jpg"
+},
+
+{
+question:"Maple	(Acer)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Acer_pseudoplatanus_002.jpg/500px-Acer_pseudoplatanus_002.jpg"
+},
+
+{
+question:"Eucalyptus (Eucalyptus)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Eucalyptus_tereticornis_flowers%2C_capsules%2C_buds_and_foliage.jpeg/500px-Eucalyptus_tereticornis_flowers%2C_capsules%2C_buds_and_foliage.jpeg"
+},
+
+{
+question:"Clover (Trifolium)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/A_drop_of_dew_on_a_clover.jpg/500px-A_drop_of_dew_on_a_clover.jpg"
+},
+
+{
+question:"Beans (Fabaceae family)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Fava_beans_1.jpg/500px-Fava_beans_1.jpg"
+},
+
+{
+question:"Dewberry (Rubus hispidus)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Rubus-hispidus-Acadia.jpg/500px-Rubus-hispidus-Acadia.jpg"
+},
+
+{
+question:"Holly	(Ilex)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Ilex-aquifolium_%28Europaeische_Stechpalme-1%29.jpg/500px-Ilex-aquifolium_%28Europaeische_Stechpalme-1%29.jpg"
+},
+
+{
+question:"Almond (Prunus dulcis)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Madrigueras_%2820578932389%29_%28cropped%29.jpg/960px-Madrigueras_%2820578932389%29_%28cropped%29.jpg"
+},
+
+{
+question:"Datura (Datura)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Datura_inoxia_%288482127654%29.jpg/250px-Datura_inoxia_%288482127654%29.jpg"
+},
+
+{
+question:"Blueberries (Vaccinium)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Blueberries.jpg/500px-Blueberries.jpg"
+},
+
+{
+question:"Citrus fruits	(Citrus)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Slices_of_Citrus_fruit_sit_on_a_Light_table_-_USDA-ARS.jpg/330px-Slices_of_Citrus_fruit_sit_on_a_Light_table_-_USDA-ARS.jpg"
+},
+
+{
+question:"Durian (Durio)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Durian_in_black.jpg/960px-Durian_in_black.jpg"
+},
+
+{
+question:"Lupin	(Lupinus)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Buds_and_flowers_of_Lupinus_albifrons.jpg/500px-Buds_and_flowers_of_Lupinus_albifrons.jpg"
+},
+
+{
+question:"Canola (Brassica napus)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Champ_de_colza_C%C3%B4te-d%27Or_Bourgogne_avril_2014.jpg/500px-Champ_de_colza_C%C3%B4te-d%27Or_Bourgogne_avril_2014.jpg"
+},
+
+{
+question:"Blackberry (Rubus)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/-2020-09-23_Blackberrys%2C_Coast_Path%2C_Trimingham.JPG/960px--2020-09-23_Blackberrys%2C_Coast_Path%2C_Trimingham.JPG"
+},
+
+{
+question:"Hemp (Cannabis)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Cannabis_plants_in_front_of_the_Dhaulagiri_summit.jpg/500px-Cannabis_plants_in_front_of_the_Dhaulagiri_summit.jpg"
+},
+
+{
+question:"Clove	(Syzygium aromaticum)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/The_flowers_of_clove_tree_in_Pemba_island.JPG/500px-The_flowers_of_clove_tree_in_Pemba_island.JPG"
+},
+
+{
+question:"Ash (Fraxinus)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Fraxinus_latifolia_JPG1A.jpg/500px-Fraxinus_latifolia_JPG1A.jpg"
+},
+
+{
+question:"Rosemary (Salvia rosmarinus)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Rosemary_in_bloom.JPG/500px-Rosemary_in_bloom.JPG"
+},
+
+{
+question:"Beech	(Fagus)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Fagus_hayatae_98412.jpg/250px-Fagus_hayatae_98412.jpg"
+},
+
+{
+question:"Mulberry (Morus)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Morus_alba_FrJPG.jpg/500px-Morus_alba_FrJPG.jpg"
+},
+
+{
+question:"Lilac	(Syringa)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Stockholm-lilac.jpg/500px-Stockholm-lilac.jpg"
+},
+
+{
+question:"Milkweed (Asclepias)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Swamp_Milkweed_Asclepias_incarnata_Flowers_Closeup_2800px.jpg/250px-Swamp_Milkweed_Asclepias_incarnata_Flowers_Closeup_2800px.jpg"
+},
+
+{
+question:"Peanut (Arachis hypogaea)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Arachis_hypogaea_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-163.jpg/500px-Arachis_hypogaea_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-163.jpg"
+},
+
+{
+question:"Tomato (Solanum lycopersicum)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Tomato_je.jpg/500px-Tomato_je.jpg"
+},
+
+{
+question:"Eggplant (Solanum lycopersicum)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Solanum_melongena_24_08_2012_%281%29.JPG/500px-Solanum_melongena_24_08_2012_%281%29.JPG"
+},
+
+{
+question:"Tobacco (Nicotiana)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Tabak_P9290021.JPG/500px-Tabak_P9290021.JPG"
+},
+
+{
+question:"Chrysanthemum	(Chrysanthemum)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Chrysanthemum_nangkingense.jpg/500px-Chrysanthemum_nangkingense.jpg"
+},
+
+{
+question:"Ox-eye daisy (Leucanthemum vulgare)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Leucanthemum_vulgare_%27Filigran%27_Flower_2200px.jpg/500px-Leucanthemum_vulgare_%27Filigran%27_Flower_2200px.jpg"
+},
+
+{
+question:"Pistachio	(Pistacia vera)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/860631-Pistachio-IMG_6862-2.jpg/500px-860631-Pistachio-IMG_6862-2.jpg"
+},
+
+{
+question:"Fennel (Foeniculum vulgare)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Foeniculum_July_2011-1a.jpg/500px-Foeniculum_July_2011-1a.jpg"
+},
+
+{
+question:"Pear (Pyrus)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/PearBlossomsCalifornia.jpg/330px-PearBlossomsCalifornia.jpg"
+},
+
+{
+question:"Strawberries (Fragaria)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Fragaria_vesca_-_metsmaasikas.jpg/500px-Fragaria_vesca_-_metsmaasikas.jpg"
+},
+
+{
+question:"Olive	(Olea)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Olive-tree-fruit-august-0.jpg/500px-Olive-tree-fruit-august-0.jpg"
+},
+
+{
+question:"Apricot (Prunus armeniaca)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Packard_apricots.jpg/500px-Packard_apricots.jpg"
+},
+
+{
+question:"Cherry (Prunus serotina & Prunus avium)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Amerikaanse_vogelkers_Prunus_serotina_closeup.jpg/500px-Amerikaanse_vogelkers_Prunus_serotina_closeup.jpg"
+},
+
+{
+question:"Pea (Lathyrus oleraceus)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Doperwt_rijserwt_peulen_Pisum_sativum.jpg/500px-Doperwt_rijserwt_peulen_Pisum_sativum.jpg"
+},
+
+{
+question:"Ivy (Hedera)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Hedera_algeriensis_kz01.jpg/500px-Hedera_algeriensis_kz01.jpg"
+},
+
+{
+question:"Oak (Quercus)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Brockwell_Oak_%289%29.jpg/500px-Brockwell_Oak_%289%29.jpg"
+},
+
+{
+question:"Fig (Ficus)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Drvo_smokve.JPG/330px-Drvo_smokve.JPG"
+},
+
+{
+question:"Peach	(Prunus persica)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Autumn_Red_peaches.jpg/500px-Autumn_Red_peaches.jpg"
+},
+
+{
+question:"Parsley (Petroselinum crispum)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Parsley100.jpg/500px-Parsley100.jpg"
+},
+
+{
+question:"Foxglove (Digitalis purpurea)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Foxglove_--_Digitalis_purpurea.jpg/250px-Foxglove_--_Digitalis_purpurea.jpg"
+},
+
+{
+question:"Cotton plant (Gossypium)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/CottonPlant.JPG/500px-CottonPlant.JPG"
+},
+
+{
+question:"European flax	(Linum usitatissimum)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Linum_usitatissimum_20230402.jpg/500px-Linum_usitatissimum_20230402.jpg"
+},
+
+{
+question:"Poison ivy (Toxicodendron radicans)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Rhus_radicans_006.jpg/250px-Rhus_radicans_006.jpg"
+},
+
+{
+question:"Queen Anne's lace	(Daucus carota)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Daucus_carota_May_2008-1_edit.jpg/500px-Daucus_carota_May_2008-1_edit.jpg"
+},
+
+{
+question:"Mango	(Mangifera indica)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Mangoes_%28Magnifera_indica%29_from_India.jpg/500px-Mangoes_%28Magnifera_indica%29_from_India.jpg"
+},
+
+{
+question:"Dandelion	(Taraxacum)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/HAWKBEARD.jpg/500px-HAWKBEARD.jpg"
+},
+
+{
+question:"Coffee (Coffea)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Starr_070308-5472_Coffea_arabica.jpg/500px-Starr_070308-5472_Coffea_arabica.jpg"
+},
+
+{
+question:"Cabbage (Brassica)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Wild_legume%2C_Mill_Bay_Cove_-_geograph.org.uk_-_1011472.jpg/500px-Wild_legume%2C_Mill_Bay_Cove_-_geograph.org.uk_-_1011472.jpg"
+},
+
+{
+question:"Rose (Rosa)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Rosa_rubiginosa_1.jpg/500px-Rosa_rubiginosa_1.jpg"
+},
+
+{
+question:"Apple	(Malus domestica)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Malus_domestica_a1.jpg/500px-Malus_domestica_a1.jpg"
+},
+
+{
+question:"Lavender (Lavandula)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Single_lavender_flower02.jpg/500px-Single_lavender_flower02.jpg"
+},
+
+{
+question:"Coneflower (Rudbeckia)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Rudbeckia_hirta_flower_closeup.jpg/500px-Rudbeckia_hirta_flower_closeup.jpg"
+},
+
+{
+question:"Raspberry	(Rubus)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Fert%C5%91di_k%C3%A1rmin_m%C3%A1lna.JPG/500px-Fert%C5%91di_k%C3%A1rmin_m%C3%A1lna.JPG"
+},
+
+{
+question:"Nettle (Urtica dioica)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Urtica_dioica_specimen%2C_Cambridge_University_Botanic_Garden.jpg/500px-Urtica_dioica_specimen%2C_Cambridge_University_Botanic_Garden.jpg"
+},
+
+{
+question:"Alder	(Alnus)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/20120904Alnus_glutinosa01.jpg/500px-20120904Alnus_glutinosa01.jpg"
+},
+
+{
+question:"Dogwood (Cornus)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Blooming_Dogwood.jpg/500px-Blooming_Dogwood.jpg"
+},
+
+{
+question:"Hydrangea	(Hydrangea macrophylla)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Hydrangea_macrophylla_-_Pia.JPG/330px-Hydrangea_macrophylla_-_Pia.JPG"
+},
+
+{
+question:"Potato (Solanum tuberosum)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Potato_bag_cultivation.JPG/500px-Potato_bag_cultivation.JPG"
+},
+
+{
+question:"Parsnip (Pastinaca sativa)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Pastinaca_sativa_Sturm28.jpg/500px-Pastinaca_sativa_Sturm28.jpg"
+},
+
+{
+question:"Okra (Abelmoschus esculentus)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Hong_Kong_Okra_Aug_25_2012.JPG/500px-Hong_Kong_Okra_Aug_25_2012.JPG"
+},
+
+{
+question:"Hollyhock (Alcea)",
+answer:false,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Alcea_setosa.jpg/500px-Alcea_setosa.jpg"
+},
+
+{
+question:"Madrone (Arbutus)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Arbouse.jpg/500px-Arbouse.jpg"
+},
+
+{
+question:"Chokeberry (Aronia)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Chokeberries.jpg/500px-Chokeberries.jpg"
+},
+
+{
+question:"Wormwood (Artemisia absinthium)",
+answer:true,
+image:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Artemisia_absinthium_P1210748.jpg/500px-Artemisia_absinthium_P1210748.jpg"
+}
+
+
+];
+
+let current = 0;
+let score = 0;
+let wrongAnswers = [];
+let totalQuestions = 10;
+
+// SHUFFLE FUNCTION //
+function shuffleArray(array){
+for (let i = array.length - 1; i > 0; i--){
+const j = Math.floor(Math.random() * (i + 1));
+[array[i], array[j]] = [array[j], array[i]];
+}
+}
+
+// END SHUFFLE FUNCTION //
+
+// SLIDER LOGIC //
+
+const slider = document.getElementById("questionSlider");
+const sliderValue = document.getElementById("sliderValue");
+const updateButton = document.getElementById("updateButton");
+
+slider.value = 10;
+sliderValue.textContent = 10;
+
+
+slider.max = quiz.length;
+
+sliderValue.textContent = slider.value;
+
+slider.oninput = function(){
+
+sliderValue.textContent = this.value;
+
+if(this.value != 10){
+updateButton.classList.add("update-active");
+}
+else{
+updateButton.classList.remove("update-active");
+}
+
+};
+
+// END SLIDER LOGIC //
+
+function startQuiz(){
+
+totalQuestions = parseInt(slider.value);
+
+shuffleArray(quiz);
+
+quiz.length = totalQuestions;
+
+document.getElementById("quizSetup").style.display = "none";
+
+loadQuestion();
+
+}
+
+function loadQuestion(){
+
+document.getElementById("progress").textContent =
+"Question " + (current+1) + " of " + totalQuestions;
+
+document.getElementById("questionText").textContent =
+quiz[current].question;
+
+document.getElementById("questionImage").src =
+quiz[current].image;
+
+}
+
+function answer(choice){
+
+if(choice === quiz[current].answer){
+score++;
+}
+else{
+
+wrongAnswers.push({
+question: quiz[current].question,
+correct: quiz[current].answer
+});
+
+}
+
+current++;
+
+if(current < totalQuestions){
+loadQuestion();
+}
+else{
+showResult();
+}
+
+}
+
+function showResult(){
+
+document.getElementById("progress").textContent = "Quiz Complete";
+
+document.getElementById("questionText").style.display="none";
+document.getElementById("questionImage").style.display="none";
+document.getElementById("buttons").style.display="none";
+
+document.getElementById("result").textContent =
+"Score: " + score + " / " + totalQuestions;
+
+const reviewDiv = document.getElementById("review");
+
+if(wrongAnswers.length === 0){
+
+reviewDiv.innerHTML = "<p>You got every question correct!</p>";
+
+}
+else{
+
+let html = "<h3>Questions You Missed</h3>";
+
+wrongAnswers.forEach(item => {
+
+let correctText = item.correct ? "Asterid" : "Rosid";
+
+html += `
+<div class="review-item">
+<div><strong>Question:</strong> ${item.question}</div>
+<div class="correct-answer">Correct Answer: ${correctText}</div>
+</div>
+`;
+
+});
+
+reviewDiv.innerHTML = html;
+
+}
+
+}
+
+shuffleArray(quiz);
+loadQuestion();
+
+</script>
+
+</body>
+</html>
